@@ -1,0 +1,21 @@
+{
+  "verified": true,
+  "mode": "Scripted demo mode",
+  "live_llm_verified": false,
+  "desktop_viewport": "1440x1000",
+  "mobile_viewport": "390x844",
+  "checks": [
+    "one-click scripted seeded demo processed 8 tickets with persisted-state verification",
+    "scripted mode prominently visible",
+    "retry filter showed failed attempt 1 and successful attempt 2",
+    "injection ticket held for approval",
+    "customer memory visible on later ticket",
+    "pending refunds reported as awaiting human; approval simulated only",
+    "rerun kept exactly 8 drafts and 3 reviews",
+    "mobile layout has no horizontal overflow"
+  ],
+  "autonomy_claim": false,
+  "page_and_console_errors": [],
+  "recording": "demo.webm",
+  "recording_unavailable": null
+}

@@ -1,0 +1,44 @@
+# Credentials and local settings
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+# Environments, caches and builds
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+node_modules/
+dist/
+build/
+*.egg-info/
+# Local fictional runtime state and logs
+data/
+*.sqlite
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+*.log
+# Unreviewed generated evidence; curated docs/evidence is committed
+artifacts/
+test-results/
+playwright-report/
+*.webm
+*.mp4
+# Editor/OS clutter
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Legacy local build evidence is preserved but replaced by curated docs/evidence
+/dashboard-*.png
+/VERIFICATION.json
+/BROWSER_VERIFICATION.json
+# Deliberately reviewed recording for the public submission
+!docs/evidence/demo.webm

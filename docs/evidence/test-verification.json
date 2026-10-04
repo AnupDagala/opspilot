@@ -1,0 +1,10 @@
+{
+  "mode": "Scripted demo + mocked provider responses",
+  "command": "python -m pytest -q",
+  "passed": 22,
+  "failed": 0,
+  "warnings": 1,
+  "warning": "Starlette TestClient httpx adapter deprecation",
+  "live_llm_verified": false,
+  "autonomy_claim": false
+}

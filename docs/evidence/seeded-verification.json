@@ -1,0 +1,25 @@
+{
+  "verified_at_utc": "2026-10-04T11:43:31.908938+00:00",
+  "verified": true,
+  "mode": "Scripted demo mode",
+  "live_llm_verified": false,
+  "metrics": {
+    "processed": 8,
+    "escalated": 3,
+    "failed": 0,
+    "retries": 1
+  },
+  "run_status": "awaiting_human",
+  "completed_work": 5,
+  "awaiting_human": 3,
+  "run_id": "16fcb13c4e144151a5932b89becadd91",
+  "checks": [
+    "8 seeded tickets processed and independently verified; refunds awaiting human approval",
+    "transient failure recovered",
+    "duplicate HTTP request reused the same run",
+    "injection ticket held for human approval",
+    "customer preference reused",
+    "human refund approval recorded one simulated CRM action"
+  ],
+  "pending_reviews_after_demo": 2
+}

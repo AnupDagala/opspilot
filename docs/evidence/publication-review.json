@@ -1,0 +1,8 @@
+{
+  "staged_file_count": 30,
+  "automated_scan_passed": true,
+  "problems": [],
+  "reviewed_scope": "Application source, fictional policies, tests, setup, documentation and actual browser evidence only",
+  "excluded": "Credentials, .env, virtual environments, runtime databases, logs, caches, local machine paths and unrelated work",
+  "screenshots_and_video": "Actual sandbox dashboard with fictional customers only; no browser chrome or personal account data"
+}
