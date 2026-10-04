@@ -136,6 +136,8 @@ Action keys include ticket ID, revision and tool. Draft/review writes and saved 
 
 Python, FastAPI, Pydantic, SQLite, httpx, Uvicorn and plain HTML/CSS/JavaScript. Pytest verifies behavior. The model interface is an environment-configured OpenAI-compatible Chat Completions API; no real model invocation is claimed in the committed evidence. OpenAI Codex assisted implementation, debugging and tests. Playwright with headless Microsoft Edge captured the actual screenshots/recording; browser tooling is not a runtime dependency. There is no React, Docker, vector database or hosted customer integration.
 
+Clean-clone setup was verified using only the committed requirements: all 22 tests, five scoped goals, and the complete HTTP seeded workflow passed. [Clean-clone report](docs/evidence/clean-clone-verification.json) · [Successful GitHub CI run](https://github.com/AnupDagala/opspilot/actions/runs/37200032559).
+
 ## Exact verification results
 
 | Evidence | Observed result | What it demonstrates |

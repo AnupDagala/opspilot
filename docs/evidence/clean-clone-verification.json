@@ -1,0 +1,24 @@
+{
+  "verified": true,
+  "source_commit": "e18c8c2616d9d64d0cc1789b2e4e8582c37a3d32",
+  "environment": "Fresh clone, fresh Python 3.12 virtual environment, requirements.txt only",
+  "tests": {
+    "passed": 22,
+    "failed": 0,
+    "warnings": 1
+  },
+  "scoped_goal_checks": 7,
+  "scripted_goal_runs": 5,
+  "seeded_http": {
+    "processed": 8,
+    "completed_work": 5,
+    "awaiting_human": 3,
+    "failed": 0,
+    "retries": 1
+  },
+  "live_llm_verified": false,
+  "github_ci": {
+    "conclusion": "success",
+    "url": "https://github.com/AnupDagala/opspilot/actions/runs/37200032559"
+  }
+}
