@@ -1,0 +1,21 @@
+{
+  "workflow_run_url": "https://github.com/AnupDagala/opspilot/actions/runs/37659689525",
+  "workflow_run_id": 37659689525,
+  "job_id": 112923716848,
+  "source_commit": "8063fee6726998f4402c70e49fc8a0ec0e9160d0",
+  "job_conclusion": "success",
+  "actual_n8n_runtime_verified": true,
+  "fixture": "n8n/verification.workflow.json",
+  "verified": true,
+  "checks": [
+    "intake_awaiting_approval",
+    "duplicate_delivery_prevented",
+    "operator_approval_denied"
+  ],
+  "resolved_image_digest": "sha256:9c0862a08090c79122069e23131d27529c250b92e90c9d51a6ec406fe1527c4e",
+  "storage": "CI memory emulator",
+  "provider": "deterministic",
+  "real_llm_verified": false,
+  "external_services_verified": false,
+  "evidence_source": "GitHub workflow job logs; final Assert role denied output and CLI status success; bearer/session fields omitted"
+}
