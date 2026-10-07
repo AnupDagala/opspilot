@@ -58,7 +58,7 @@ node --use-env-proxy scripts/verify-api.mjs https://your-public-host
 python3 python/dealerops_client.py --url https://your-public-host
 ```
 
-The recorded hosted verification has **16 passing checks**. Local core tests have **44 passing tests**, and the deterministic extraction evaluation has **60/60 passing cases**. n8n workflow graph/syntax checks passed; actual n8n runtime evidence is reported separately in CI if it completes successfully. Passing deterministic cases do not establish model quality.
+The recorded hosted verification has **16 passing checks**. Local core tests have **44 passing tests**, and the deterministic extraction evaluation has **60/60 passing cases**. The [GitHub CI run](https://github.com/AnupDagala/opspilot/actions/runs/37659689525) passed and executed the real n8n verification workflow: intake awaiting approval, duplicate prevention and operator approval denial. The fixture uses the same handlers through a CI HTTP bridge with memory storage; this is n8n runtime evidence, not an external ERP connection. Passing deterministic cases do not establish model quality.
 
 ## Project files
 
