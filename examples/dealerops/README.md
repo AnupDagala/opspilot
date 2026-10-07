@@ -6,7 +6,7 @@ An independent dealer-order automation companion to OpsPilot, built by **Anup Da
 
 The demo is public. Each visitor gets an isolated synthetic sandbox; no hosting sign-in is needed.
 
-**Source:** companion in OpsPilot under `examples/dealerops`. The hosted demo also includes a complete source ZIP and execution-evidence video.
+**Source:** [OpsPilot companion](https://github.com/AnupDagala/opspilot/tree/main/examples/dealerops). The public demo also includes a [complete source ZIP](https://dealerops-lab-anup.anup-dagala.chatgpt.site/downloads/dealerops-source.zip).
 
 - [92-second execution evidence replay](evidence/execution-walkthrough.mp4) · [Hosted MP4](https://dealerops-lab-anup.anup-dagala.chatgpt.site/downloads/execution-walkthrough.mp4)
 - [Hosted API evidence](evidence/hosted-api-verification.json)
