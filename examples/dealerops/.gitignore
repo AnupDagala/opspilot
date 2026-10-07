@@ -1,0 +1,10 @@
+dist/
+site.tar.gz
+artifacts/
+node_modules/
+*.tar.gz
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
