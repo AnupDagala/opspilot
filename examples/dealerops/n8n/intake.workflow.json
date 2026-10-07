@@ -1,0 +1,121 @@
+{
+  "name": "DealerOps - authenticated intake to governed order API",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "dealerops-intake",
+        "httpMethod": "POST",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Receive dealer request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "notes": "Protect this webhook with Header Auth before exposing n8n beyond localhost. Incoming data is synthetic."
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $input.first().json.body;\nif (!b || !['D001','D002'].includes(b.dealer) || typeof b.message !== 'string' || b.message.length > 2000 || !/^[A-Za-z0-9_-]{1,80}$/.test(b.event_id)) throw new Error('invalid_intake');\nreturn [{json:{dealer:b.dealer,message:b.message,event_id:b.event_id,channel:'whatsapp'}}];"
+      },
+      "id": "validate",
+      "name": "Validate synthetic input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dealerops-lab-anup.anup-dagala.chatgpt.site/api/intake",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Demo-Session",
+              "value": "REPLACE_WITH_YOUR_SANDBOX_SESSION_ID"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "id": "intake",
+      "name": "Call governed order API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        0
+      ],
+      "notes": "Configure an HTTP Header Auth credential named Authorization with value Bearer YOUR_OPERATOR_TOKEN. Private Sites also need a locally configured bypass header; do not export it. No automatic approval."
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nreturn [{json:{order_id:d.result.order.id,status:d.result.order.status,questions:d.result.order.questions,duplicate:d.result.duplicate,mode:d.result.order.mode,approval_required:d.result.order.status==='AWAITING_APPROVAL'}}];"
+      },
+      "id": "result",
+      "name": "Return measured outcome",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Receive dealer request": {
+      "main": [
+        [
+          {
+            "node": "Validate synthetic input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate synthetic input": {
+      "main": [
+        [
+          {
+            "node": "Call governed order API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call governed order API": {
+      "main": [
+        [
+          {
+            "node": "Return measured outcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "tags": []
+}

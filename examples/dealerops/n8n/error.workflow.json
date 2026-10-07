@@ -1,0 +1,48 @@
+{
+  "name": "DealerOps - error record for operator review",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "error",
+      "name": "Workflow failure",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const e=$input.first().json; return [{json:{status:'OPERATOR_REVIEW_REQUIRED',failed_node:e.execution?.lastNodeExecuted || 'unknown',message:'Integration failure; inspect execution. No automatic resubmission after ambiguous downstream outcome.',execution_url:e.execution?.url || null}}];"
+      },
+      "id": "record",
+      "name": "Redact and classify failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Workflow failure": {
+      "main": [
+        [
+          {
+            "node": "Redact and classify failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "tags": []
+}

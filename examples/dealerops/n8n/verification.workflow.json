@@ -1,0 +1,265 @@
+{
+  "id": "dealeropsVerification",
+  "name": "DealerOps - CI actual n8n execution",
+  "nodes": [
+    {
+      "id": "manual-verification",
+      "name": "Manual verification",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "create-isolated-session",
+      "name": "Create isolated session",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        200,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8788/api/session",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{}",
+        "options": {
+          "timeout": 20000
+        }
+      }
+    },
+    {
+      "id": "intake-order",
+      "name": "Intake order",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        400,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8788/api/intake",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Demo-Session",
+              "value": "={{ $node[\"Create isolated session\"].json.session }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" + $node[\"Create isolated session\"].json.operator }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"event_id\": \"n8n-ci-order\", \"dealer\": \"D001\", \"channel\": \"whatsapp\", \"message\": \"20 cartons AB100 tomorrow\"}",
+        "options": {
+          "timeout": 20000
+        }
+      }
+    },
+    {
+      "id": "assert-awaiting-approval",
+      "name": "Assert awaiting approval",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const d=$input.first().json;if(d.result.order.status!=='AWAITING_APPROVAL'||d.state.stock.AB100!==120)throw new Error('intake_failed');return [{json:d}];"
+      }
+    },
+    {
+      "id": "replay-delivery",
+      "name": "Replay delivery",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8788/api/intake",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Demo-Session",
+              "value": "={{ $node[\"Create isolated session\"].json.session }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" + $node[\"Create isolated session\"].json.operator }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"event_id\": \"n8n-ci-order\", \"dealer\": \"D001\", \"channel\": \"whatsapp\", \"message\": \"20 cartons AB100 tomorrow\"}",
+        "options": {
+          "timeout": 20000
+        }
+      }
+    },
+    {
+      "id": "assert-duplicate-prevented",
+      "name": "Assert duplicate prevented",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const d=$input.first().json;if(!d.result.duplicate||d.state.orders.length!==1)throw new Error('duplicate_failed');return [{json:d}];"
+      }
+    },
+    {
+      "id": "attempt-operator-approval",
+      "name": "Attempt operator approval",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1200,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8788/api/approve",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Demo-Session",
+              "value": "={{ $node[\"Create isolated session\"].json.session }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" + $node[\"Create isolated session\"].json.operator }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({id:$node[\"Intake order\"].json.result.order.id,revision:1}) }}",
+        "options": {
+          "timeout": 20000,
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "assert-role-denied",
+      "name": "Assert role denied",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1400,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const d=$input.first().json;if(d.error!=='role_forbidden')throw new Error('role_check_failed');return [{json:{verified:true,checks:['intake_awaiting_approval','duplicate_delivery_prevented','operator_approval_denied'],storage:'CI memory emulator',provider:'deterministic',external_services:false}}];"
+      }
+    }
+  ],
+  "connections": {
+    "Manual verification": {
+      "main": [
+        [
+          {
+            "node": "Create isolated session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create isolated session": {
+      "main": [
+        [
+          {
+            "node": "Intake order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intake order": {
+      "main": [
+        [
+          {
+            "node": "Assert awaiting approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assert awaiting approval": {
+      "main": [
+        [
+          {
+            "node": "Replay delivery",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replay delivery": {
+      "main": [
+        [
+          {
+            "node": "Assert duplicate prevented",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assert duplicate prevented": {
+      "main": [
+        [
+          {
+            "node": "Attempt operator approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attempt operator approval": {
+      "main": [
+        [
+          {
+            "node": "Assert role denied",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "tags": []
+}
