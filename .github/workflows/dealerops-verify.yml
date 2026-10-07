@@ -1,0 +1,36 @@
+# Install at .github/workflows/dealerops-verify.yml in the OpsPilot repository.
+name: DealerOps verification
+on:
+  push:
+    paths: ['examples/dealerops/**', '.github/workflows/dealerops-verify.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  order-controls:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/dealerops
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node --test tests/core.test.mjs
+      - run: node scripts/evaluate.mjs
+      - run: node scripts/validate-workflows.mjs
+      - run: python3 -m py_compile python/*.py
+      - name: Execute real n8n verification workflow
+        run: |
+          node scripts/ci-server.mjs > /tmp/dealerops-ci-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8788/api/health > /dev/null; then break; fi
+            sleep 1
+          done
+          docker pull docker.n8n.io/n8nio/n8n:stable
+          docker volume create dealerops-n8n-ci
+          docker run --rm --network host -v "$PWD:/work:ro" -v dealerops-n8n-ci:/home/node/.n8n docker.n8n.io/n8nio/n8n:stable import:workflow --input=/work/n8n/verification.workflow.json
+          docker run --rm --network host -e N8N_RUNNERS_ENABLED=true -v "$PWD:/work:ro" -v dealerops-n8n-ci:/home/node/.n8n docker.n8n.io/n8nio/n8n:stable execute --id=dealeropsVerification
