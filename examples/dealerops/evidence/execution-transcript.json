@@ -1,0 +1,139 @@
+[
+  {
+    "step": "Hosted service health",
+    "result": "PASS",
+    "evidence": {
+      "ok": true,
+      "storage": "r2",
+      "mode": "deterministic",
+      "integration": "synthetic ERP",
+      "version": "1.0.0"
+    }
+  },
+  {
+    "step": "Clear order requires reviewer approval",
+    "result": "PASS",
+    "evidence": {
+      "status": "AWAITING_APPROVAL",
+      "total": 250000,
+      "revision": 1
+    }
+  },
+  {
+    "step": "Duplicate delivery creates no second order",
+    "result": "PASS",
+    "evidence": {
+      "orders": 1,
+      "duplicate": true
+    }
+  },
+  {
+    "step": "Conflicting event payload rejected",
+    "result": "PASS",
+    "evidence": {
+      "http": 409,
+      "error": "event_id_payload_conflict"
+    }
+  },
+  {
+    "step": "Operator cannot approve",
+    "result": "PASS",
+    "evidence": {
+      "http": 403,
+      "error": "role_forbidden"
+    }
+  },
+  {
+    "step": "Reviewer approves current evidence",
+    "result": "PASS",
+    "evidence": {
+      "status": "APPROVED",
+      "revision": 1
+    }
+  },
+  {
+    "step": "Edit invalidates approval",
+    "result": "PASS",
+    "evidence": {
+      "status": "AWAITING_APPROVAL",
+      "revision": 2,
+      "approval": null
+    }
+  },
+  {
+    "step": "Stale execution rejected",
+    "result": "PASS",
+    "evidence": {
+      "http": 409,
+      "error": "stale_execution"
+    }
+  },
+  {
+    "step": "Updated order reapproved",
+    "result": "PASS",
+    "evidence": {
+      "status": "APPROVED"
+    }
+  },
+  {
+    "step": "Lost acknowledgement remains pending",
+    "result": "PASS",
+    "evidence": {
+      "status": "SYNC_PENDING",
+      "stock": 99,
+      "effects": 1
+    }
+  },
+  {
+    "step": "Recovery reads saved receipt without double commit",
+    "result": "PASS",
+    "evidence": {
+      "status": "COMPLETED",
+      "stock": 99,
+      "effects": 1,
+      "credit": 237500
+    }
+  },
+  {
+    "step": "Repeated execution is idempotent",
+    "result": "PASS",
+    "evidence": {
+      "duplicate": true,
+      "stock": 99
+    }
+  },
+  {
+    "step": "Ambiguous SKU is not guessed",
+    "result": "PASS",
+    "evidence": {
+      "status": "NEEDS_CLARIFICATION",
+      "questions": [
+        "Which SKU do you want?"
+      ]
+    }
+  },
+  {
+    "step": "Discount exception requires review",
+    "result": "PASS",
+    "evidence": {
+      "status": "REVIEW_REQUIRED",
+      "total": 85000
+    }
+  },
+  {
+    "step": "Cross-session access denied",
+    "result": "PASS",
+    "evidence": {
+      "http": 403,
+      "error": "session_forbidden"
+    }
+  },
+  {
+    "step": "Fresh read retains committed state",
+    "result": "PASS",
+    "evidence": {
+      "status": "COMPLETED",
+      "stock": 99
+    }
+  }
+]

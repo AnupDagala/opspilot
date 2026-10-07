@@ -1,0 +1,150 @@
+{
+  "captured_at": "2026-10-07T15:09:49.357Z",
+  "base_url": "https://local-worker.invalid",
+  "execution": "In-process Worker Request handlers; file-backed R2 contract emulator",
+  "hosted_api_verified": false,
+  "mode": "deterministic",
+  "real_model_verified": false,
+  "real_business_integration_verified": false,
+  "browser_qa_verified": false,
+  "passed": 16,
+  "results": [
+    {
+      "name": "Hosted service health",
+      "passed": true,
+      "evidence": {
+        "ok": true,
+        "storage": "r2",
+        "mode": "deterministic",
+        "integration": "synthetic ERP",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "Clear order requires reviewer approval",
+      "passed": true,
+      "evidence": {
+        "status": "AWAITING_APPROVAL",
+        "total": 250000,
+        "revision": 1
+      }
+    },
+    {
+      "name": "Duplicate delivery creates no second order",
+      "passed": true,
+      "evidence": {
+        "orders": 1,
+        "duplicate": true
+      }
+    },
+    {
+      "name": "Conflicting event payload rejected",
+      "passed": true,
+      "evidence": {
+        "http": 409,
+        "error": "event_id_payload_conflict"
+      }
+    },
+    {
+      "name": "Operator cannot approve",
+      "passed": true,
+      "evidence": {
+        "http": 403,
+        "error": "role_forbidden"
+      }
+    },
+    {
+      "name": "Reviewer approves current evidence",
+      "passed": true,
+      "evidence": {
+        "status": "APPROVED",
+        "revision": 1
+      }
+    },
+    {
+      "name": "Edit invalidates approval",
+      "passed": true,
+      "evidence": {
+        "status": "AWAITING_APPROVAL",
+        "revision": 2,
+        "approval": null
+      }
+    },
+    {
+      "name": "Stale execution rejected",
+      "passed": true,
+      "evidence": {
+        "http": 409,
+        "error": "stale_execution"
+      }
+    },
+    {
+      "name": "Updated order reapproved",
+      "passed": true,
+      "evidence": {
+        "status": "APPROVED"
+      }
+    },
+    {
+      "name": "Lost acknowledgement remains pending",
+      "passed": true,
+      "evidence": {
+        "status": "SYNC_PENDING",
+        "stock": 99,
+        "effects": 1
+      }
+    },
+    {
+      "name": "Recovery reads saved receipt without double commit",
+      "passed": true,
+      "evidence": {
+        "status": "COMPLETED",
+        "stock": 99,
+        "effects": 1,
+        "credit": 237500
+      }
+    },
+    {
+      "name": "Repeated execution is idempotent",
+      "passed": true,
+      "evidence": {
+        "duplicate": true,
+        "stock": 99
+      }
+    },
+    {
+      "name": "Ambiguous SKU is not guessed",
+      "passed": true,
+      "evidence": {
+        "status": "NEEDS_CLARIFICATION",
+        "questions": [
+          "Which SKU do you want?"
+        ]
+      }
+    },
+    {
+      "name": "Discount exception requires review",
+      "passed": true,
+      "evidence": {
+        "status": "REVIEW_REQUIRED",
+        "total": 85000
+      }
+    },
+    {
+      "name": "Cross-session access denied",
+      "passed": true,
+      "evidence": {
+        "http": 403,
+        "error": "session_forbidden"
+      }
+    },
+    {
+      "name": "Fresh read retains committed state",
+      "passed": true,
+      "evidence": {
+        "status": "COMPLETED",
+        "stock": 99
+      }
+    }
+  ]
+}
