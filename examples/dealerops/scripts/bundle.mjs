@@ -1,0 +1,10 @@
+import {readFile,writeFile} from 'node:fs/promises';
+import {spawnSync} from 'node:child_process';
+const pack=spawnSync('python3',['scripts/package-source.py'],{encoding:'utf8'});if(pack.status!==0)throw new Error('Source packaging failed');
+const core=await readFile('worker/core.mjs','utf8');
+const html=await readFile('worker/ui.html','utf8');
+const video=(await readFile('evidence/execution-walkthrough.mp4')).toString('base64');
+const zip=(await readFile('artifacts/dealerops-source.zip')).toString('base64');
+const assets=`\nconst ASSETS={'/downloads/execution-walkthrough.mp4':{mime:'video/mp4',data:${JSON.stringify(video)}},'/downloads/dealerops-source.zip':{mime:'application/zip',data:${JSON.stringify(zip)}}};\n`;
+const serving=`export default {fetch(request,env){const a=ASSETS[new URL(request.url).pathname];if(a){if(!['GET','HEAD'].includes(request.method))return new Response('Method not allowed',{status:405});const bytes=Uint8Array.from(atob(a.data),c=>c.charCodeAt(0));const range=request.headers.get('Range');const headers={'Content-Type':a.mime,'Cache-Control':'public, max-age=3600','Accept-Ranges':'bytes'};if(a.mime==='application/zip')headers['Content-Disposition']='attachment; filename="DealerOps_Lab_Source.zip"';if(range){const m=range.match(/^bytes=(\\d+)-(\\d*)$/);if(!m)return new Response('Invalid range',{status:416});const start=Number(m[1]),end=m[2]?Number(m[2]):bytes.length-1;if(start>end||end>=bytes.length)return new Response('Invalid range',{status:416,headers:{'Content-Range':'bytes */'+bytes.length}});headers['Content-Range']='bytes '+start+'-'+end+'/'+bytes.length;headers['Content-Length']=String(end-start+1);return new Response(request.method==='HEAD'?null:bytes.slice(start,end+1),{status:206,headers});}headers['Content-Length']=String(bytes.length);return new Response(request.method==='HEAD'?null:bytes,{headers});}return handle(request,env,HTML);}};\n`;
+await writeFile('worker/index.js',core+'\nconst HTML='+JSON.stringify(html)+';\n'+assets+serving);

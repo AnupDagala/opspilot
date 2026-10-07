@@ -1,0 +1,25 @@
+import {writeFile,mkdir} from 'node:fs/promises';
+const base=process.argv[2];if(!base)throw new Error('Usage: node scripts/verify-api.mjs https://your-host');
+let c;const results=[];const transcript=[];
+async function req(path,b,role='operator',auth=c){const r=await fetch(base+'/api/'+path,{method:b===undefined?'GET':'POST',signal:AbortSignal.timeout(20000),headers:{'Content-Type':'application/json',...(process.env.SITE_BYPASS_TOKEN?{'OAI-Sites-Authorization':'Bearer '+process.env.SITE_BYPASS_TOKEN}:{}),...(auth?{'X-Demo-Session':auth.session,Authorization:'Bearer '+auth[role]}:{})},...(b===undefined?{}:{body:JSON.stringify(b)})});const d=await r.json();return {status:r.status,data:d};}
+function check(name,ok,evidence){results.push({name,passed:!!ok,evidence});transcript.push({step:name,result:ok?'PASS':'FAIL',evidence});if(!ok)throw new Error(name);}
+const h=await req('health',undefined,'operator',null);check(process.env.DEALEROPS_INPROCESS==='1'?'Worker handler health':'Hosted service health',h.status===200,h.data);
+c=(await req('session',{},'operator',null)).data;
+const b={event_id:'verified-order',dealer:'D001',channel:'whatsapp',message:'20 cartons AB100 tomorrow'};
+let d=await req('intake',b);const o=d.data.result.order;check('Clear order requires reviewer approval',o.status==='AWAITING_APPROVAL',{status:o.status,total:o.total,revision:o.revision});
+d=await req('intake',b);check('Duplicate delivery creates no second order',d.data.result.duplicate&&d.data.state.orders.length===1,{orders:d.data.state.orders.length,duplicate:d.data.result.duplicate});
+d=await req('intake',{...b,message:'21 cartons AB100 tomorrow'});check('Conflicting event payload rejected',d.status===409,{http:d.status,error:d.data.error});
+d=await req('approve',{id:o.id,revision:1});check('Operator cannot approve',d.status===403,{http:d.status,error:d.data.error});
+d=await req('approve',{id:o.id,revision:1},'reviewer');check('Reviewer approves current evidence',d.data.result.order.status==='APPROVED',{status:d.data.result.order.status,revision:1});
+d=await req('modify',{id:o.id,revision:1,quantity:21});check('Edit invalidates approval',d.data.result.order.approved===null&&d.data.result.order.revision===2,{status:d.data.result.order.status,revision:2,approval:d.data.result.order.approved});
+d=await req('execute',{id:o.id,revision:1});check('Stale execution rejected',d.status===409,{http:d.status,error:d.data.error});
+d=await req('approve',{id:o.id,revision:2},'reviewer');check('Updated order reapproved',d.data.result.order.status==='APPROVED',{status:d.data.result.order.status});
+d=await req('execute',{id:o.id,revision:2,failure:'timeout_after_commit'});check('Lost acknowledgement remains pending',d.data.result.order.status==='SYNC_PENDING',{status:d.data.result.order.status,stock:d.data.state.stock.AB100,effects:Object.keys(d.data.state.effects).length});
+d=await req('reconcile',{id:o.id});check('Recovery reads saved receipt without double commit',d.data.result.order.status==='COMPLETED'&&d.data.state.stock.AB100===99&&Object.keys(d.data.state.effects).length===1,{status:d.data.result.order.status,stock:d.data.state.stock.AB100,effects:Object.keys(d.data.state.effects).length,credit:d.data.state.credit.D001});
+d=await req('execute',{id:o.id,revision:2});check('Repeated execution is idempotent',d.data.result.duplicate&&d.data.state.stock.AB100===99,{duplicate:d.data.result.duplicate,stock:d.data.state.stock.AB100});
+d=await req('intake',{...b,event_id:'ambiguous',message:'20 cartons usual item tomorrow'});check('Ambiguous SKU is not guessed',d.data.result.order.status==='NEEDS_CLARIFICATION',{status:d.data.result.order.status,questions:d.data.result.order.questions});
+d=await req('intake',{...b,event_id:'discount',message:'10 cartons TB200 tomorrow with 30% discount'});check('Discount exception requires review',d.data.result.order.status==='REVIEW_REQUIRED',{status:d.data.result.order.status,total:d.data.result.order.total});
+const another=(await req('session',{},'operator',null)).data;d=await req('state',undefined,'operator',{...another,operator:c.operator});check('Cross-session access denied',d.status===403,{http:d.status,error:d.data.error});
+d=await req('state');check('Fresh read retains committed state',d.data.orders[0].status==='COMPLETED'&&d.data.stock.AB100===99,{status:d.data.orders[0].status,stock:d.data.stock.AB100});
+const local=process.env.DEALEROPS_INPROCESS==='1';
+await mkdir('evidence',{recursive:true});await writeFile('evidence/'+(local?'local':'hosted')+'-api-verification.json',JSON.stringify({captured_at:new Date().toISOString(),base_url:base,execution:local?'In-process Worker Request handlers; file-backed R2 contract emulator':'Hosted HTTP requests',hosted_api_verified:!local,mode:h.data.mode,real_model_verified:false,real_business_integration_verified:false,browser_qa_verified:false,passed:results.length,results},null,2)+'\n');await writeFile('evidence/execution-transcript.json',JSON.stringify(transcript,null,2)+'\n');console.log(`${results.length} ${local?'local Worker handler':'hosted API'} checks passed. No role credentials recorded.`);
