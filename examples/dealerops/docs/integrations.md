@@ -14,7 +14,7 @@ Open localhost port 5678, complete n8n's owner setup and import `n8n/intake.work
 
 The workflow receives a synthetic dealer request, validates its shape, calls the service and returns its measured status. It does not approve or execute orders. Enable Header Auth on the incoming webhook before exposing it beyond localhost. Import the error workflow and select it in workflow settings; it redacts the failure summary and preserves the need for operator review. Actual alert delivery is not configured.
 
-`n8n/verification.workflow.json` is a separate manually triggered fixture. CI imports and executes it against `scripts/ci-server.mjs`, which runs the same order handlers with an explicitly labelled memory storage emulator. The fixture verifies awaiting approval, duplicate-event prevention and operator-role denial. That establishes n8n orchestration only if the CI execution completes successfully; it does not prove live business integrations.
+`n8n/verification.workflow.json` is a separate manually triggered fixture. CI imports and executes it against `scripts/ci-server.mjs`, which runs the same order handlers with an explicitly labelled memory storage emulator. The fixture verifies awaiting approval, duplicate-event prevention and operator-role denial. The CI execution passed: [observed run](https://github.com/AnupDagala/opspilot/actions/runs/37659689525). All three assertions returned verified=true. The resolved image digest was sha256:9c0862a08090c79122069e23131d27529c250b92e90c9d51a6ec406fe1527c4e. This verifies the fixture orchestration, not production webhook delivery or live business integrations.
 
 ## Optional LangChain extraction
 

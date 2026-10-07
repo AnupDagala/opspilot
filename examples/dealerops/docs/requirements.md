@@ -5,7 +5,7 @@
 | Python or JavaScript | JavaScript Worker/API; Python client and optional services | 44 JavaScript behavioural tests; Python compilation |
 | Business understanding | Dealer pricing, stock, credit, ambiguous requests and approvals | 60 deterministic cases and hosted scenarios |
 | API integration | Real hosted API and R2 persistence | 16 deployed API checks |
-| n8n workflow | Intake/error exports, Compose setup and real-runtime CI workflow | Graph/syntax checked; consult CI for runtime outcome |
+| n8n workflow | Intake/error exports, Compose setup and real-runtime CI workflow | Graph/syntax passed; actual n8n verification fixture passed in GitHub CI (3 checks, CI memory storage) |
 | LangChain | Structured-extraction service and schemas | Source compiled; dependency/provider execution unverified |
 | LLM prompt measurement | Two versions and held-out 60-case runner with latency/usage capture | Not executed against a real provider; no model-performance claim |
 | CRM/spreadsheet connection | Google Sheets inventory reader | Not run: authorised Google credentials unavailable |
