@@ -1,5 +1,12 @@
 # OpsPilot
 
+## DealerOps Lab — dealer order automation
+
+[Public demo](https://dealerops-lab-anup.anup-dagala.chatgpt.site) · [Source, workflows and evidence](examples/dealerops) · [92-second execution replay](examples/dealerops/evidence/execution-walkthrough.mp4)
+
+Independent companion built around dealer-to-ERP order intake: clarification, catalogue/credit checks, separate reviewer approval, approval invalidation after edits, duplicate prevention and persisted receipt reconciliation. Includes Python and optional LangChain adapters, n8n exports and reproducible verification. Extraction defaults to a deterministic parser; real LLM and external business integrations remain unverified. See the companion README for exact evidence and limits.
+
+
 A narrow support operations worker built for the CentrAlign AI engineering assessment: **goal → tool execution → observation → adaptation → persisted-state verification**.
 
 **Live autonomy is not yet verified.** No API key was available during submission preparation. The live path is implemented and exercised with mocked provider responses; the real screenshots, recording and scenario reports use prominently labelled **Scripted demo mode**. Scripted runs are evidence of the local tools, safeguards and persistence, not evidence of model-driven autonomy.
@@ -182,3 +189,4 @@ There is no authentication, production deployment, durable distributed queue or 
 ## What I would build next
 
 First, run and publish real-provider evaluations for the three goal contracts, including prompt-injection and failure cases. Then add a durable worker queue and resumable conversations, authentication before shared hosting, better policy retrieval, semantic draft-quality checks and richer preference extraction. Any real CRM/payment integration would require separate permissions and irreversible-action controls.
+
