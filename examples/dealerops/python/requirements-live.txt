@@ -1,0 +1,5 @@
+# Optional live extraction dependencies; not needed for the JavaScript demo.
+# Exact installation/provider compatibility must be recorded before claiming live verification.
+langchain>=1,<2
+langchain-openai>=1,<2
+pydantic>=2,<3
